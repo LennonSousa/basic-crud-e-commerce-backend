@@ -6,6 +6,7 @@ require('dotenv/config');
 const publicRoutes = [
     '/users/authenticate',
     '/users/new',
+    '/users/reset',
     '/uploads',
 ]
 

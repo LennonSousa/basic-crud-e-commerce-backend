@@ -1,0 +1,39 @@
+<style>
+    .container {
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .email-head {
+        height: 100px;
+        background-color: #00d1c7;
+        color: #fff;
+        width: 100%;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+    }
+
+    .content {
+        margin-top: 15px;
+    }
+</style>
+
+<div class="container">
+    <section class="email-head">
+        <h1>{{store_name}}</h1>
+    </section>
+
+    <section class="content">
+        <h2>Hello {{name}}</h2>
+        <p>Welcome to {{store_name}}.</p>
+        <p>Confirm your e-mail address.</p>
+        <p><a href="{{reset_link}}" />Confirm my e-mail</a></p>
+    </section>
+
+</div>

@@ -11,7 +11,10 @@ import userView from '../views/userView';
 
 export default {
     async show(request: Request, response: Response) {
-        const { email, token } = request.query;
+        const {
+            email,
+            token,
+        } = request.body;
 
         const userNewRepository = getCustomRepository(UsersRespository);
 
@@ -37,7 +40,7 @@ export default {
 
         if (!userNewAuth)
             return response.status(400).json({
-                error: 'User e-mail or token dosen\'t exists.'
+                error: 'User already exists and activated!.'
             });
 
         if (!await bcrypt.compare(token, userNewAuth.password))
@@ -100,22 +103,13 @@ export default {
             await usersRepository.save(newUser);
 
             try {
-                mailer.sendMail({
-                    to: email,
-                    from: `${process.env.STORE_NAME} ${process.env.EMAIL_USER}`,
-                    subject: "Welcome",
-                    html: `<h2>Hello ${name}</h2>` +
-                        `<p>Welcome to ${process.env.STORE_NAME}.</p>` +
-                        `<p>Verify your e-mail address.</p>` +
-                        `<p><a href="${process.env.APP_URL}/users/new/authenticate?email=${email}&token=${tempPassword}"/>Verify e-mail address</a></p>`,
-                }, err => {
-                    if (err) {
-                        console.log('E-mail send error: ', err);
-
-                        return response.status(500).json({ message: 'Internal server error' });
-                    }
-                    else
-                        return response.status(204).json();
+                const variables = {
+                    store_name: process.env.STORE_NAME,
+                    name,
+                    reset_link: `${process.env.APP_URL}/confirm?email=${email}&token=${tempPassword}`
+                }
+                mailer.execute(email, "Welcome!", variables, "new-user").then(() => {
+                    return response.status(201).json();
                 });
             }
             catch (err) {
@@ -129,22 +123,13 @@ export default {
             await usersRepository.update(id, newUser);
 
             try {
-                mailer.sendMail({
-                    to: email,
-                    from: `${process.env.STORE_NAME} ${process.env.EMAIL_USER}`,
-                    subject: "Welcome",
-                    html: `<h2>Hello ${name}</h2>` +
-                        `<p>Welcome to ${process.env.STORE_NAME}.</p>` +
-                        `<p>Verify your e-mail address.</p>` +
-                        `<p><a href="${process.env.APP_URL}/users/new/authenticate?email=${email}&token=${tempPassword}"/>Verify e-mail address</a></p>`,
-                }, err => {
-                    if (err) {
-                        console.log('E-mail send error: ', err);
-
-                        return response.status(500).json({ message: 'Internal server error' });
-                    }
-                    else
-                        return response.status(204).json();
+                const variables = {
+                    store_name: process.env.STORE_NAME,
+                    name,
+                    reset_link: `${process.env.APP_URL}/confirm?email=${email}&token=${tempPassword}`
+                }
+                mailer.execute(email, "Welcome!", variables, "new-user").then(() => {
+                    return response.status(201).json();
                 });
             }
             catch (err) {
@@ -152,7 +137,7 @@ export default {
             }
         }
         else
-            return response.status(200).json({ message: 'User already exists and activated!' });
+            return response.status(400).json({ message: 'User already exists and activated!' });
     },
 
     async update(request: Request, response: Response) {
@@ -168,6 +153,7 @@ export default {
         const hash = await bcrypt.hash(password, 10);
 
         const data = {
+            id,
             name,
             password: hash,
             active: true,

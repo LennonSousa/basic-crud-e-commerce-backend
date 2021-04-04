@@ -35,6 +35,7 @@ export default {
         const usersRepository = getCustomRepository(UsersRepository);
 
         const data = {
+            id,
             name,
             email,
         };

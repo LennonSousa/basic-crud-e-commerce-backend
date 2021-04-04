@@ -1,15 +1,17 @@
 import { Request, Response } from 'express';
 import { getCustomRepository } from 'typeorm';
 import * as Yup from 'yup';
-
+import { ProductsRepository } from '../repositories/ProductsRepository';
 import productView from '../views/productView';
-import ProductsRepository from '../repositories/ProductsRepository';
 
 export default {
     async index(request: Request, response: Response) {
         const productsRepository = getCustomRepository(ProductsRepository);
 
         const products = await productsRepository.find({
+            order: {
+                published_at: "ASC"
+            },
             relations: [
                 'images',
             ]
@@ -95,6 +97,7 @@ export default {
         const productsRepository = getCustomRepository(ProductsRepository);
 
         const data = {
+            id,
             name,
             description,
             price,
